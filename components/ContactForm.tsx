@@ -796,7 +796,7 @@ function CoXistAIContactForm() {
             variants={fadeInUp}
           >
             <p className="text-white/40 text-sm">
-              © 2024 CoXistAI. Pioneering the future of artificial intelligence.
+              © 2025 CoXistAI. Pioneering the future of artificial intelligence.
             </p>
           </motion.div>
         </div>
