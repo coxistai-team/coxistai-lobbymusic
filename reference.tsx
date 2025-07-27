@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import supabase from '@/lib/supabase';
 
 interface AnimatedGridPatternProps {
   width?: number;
@@ -145,12 +144,13 @@ function AnimatedGridPattern({
 }
 
 function FluidParticles({
-  particleDensity = 200, // higher value = fewer particles
+  particleDensity = 100,
   particleSize = 1,
-  particleColor = "#333333",
-  activeColor = "#8b5cf6",
-  maxBlastRadius = 180,
-  interactionDistance = 40,
+  particleColor = "#555555",
+  activeColor = "#ffffff", 
+  maxBlastRadius = 300, 
+  hoverDelay = 100,
+  interactionDistance = 10,
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const contextRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -158,8 +158,7 @@ function FluidParticles({
   const mouseRef = useRef({ x: 0, y: 0, prevX: 0, prevY: 0 })
   const blastRef = useRef({ active: false, x: 0, y: 0, radius: 0, maxRadius: maxBlastRadius })
   const animationRef = useRef<number>(0)
-  const needsUpdate = useRef(false)
-  let frameSkip = 0;
+  const hoverTimerRef = useRef<number | null>(null)
 
   class Particle {
     x: number
@@ -179,16 +178,16 @@ function FluidParticles({
       this.baseX = x
       this.baseY = y
       this.size = Math.random() * particleSize + 0.5
-      this.density = Math.random() * 2 + 1 // less variance
+      this.density = Math.random() * 3 + 1
       this.color = particleColor
       this.vx = 0
       this.vy = 0
-      this.friction = 0.92 // more friction, less movement
+      this.friction = 0.9 - 0.01 * this.density
     }
 
     draw() {
       if (!contextRef.current) return
-      contextRef.current.globalAlpha = 0.8
+
       contextRef.current.fillStyle = this.color
       contextRef.current.beginPath()
       contextRef.current.arc(this.x, this.y, this.size, 0, Math.PI * 2)
@@ -198,38 +197,54 @@ function FluidParticles({
 
     update() {
       if (!contextRef.current) return
+
       this.x += this.vx
       this.y += this.vy
       this.vx *= this.friction
       this.vy *= this.friction
+
       const dx = mouseRef.current.x - this.x
       const dy = mouseRef.current.y - this.y
       const distance = Math.sqrt(dx * dx + dy * dy)
+
       if (distance < interactionDistance) {
-        // Simpler, lighter force
+        const forceDirectionX = dx / distance
+        const forceDirectionY = dy / distance
         const force = (interactionDistance - distance) / interactionDistance
-        this.vx -= (dx / (distance || 1)) * force * 0.7
-        this.vy -= (dy / (distance || 1)) * force * 0.7
+
+        this.x -= forceDirectionX * force * this.density * 0.6
+        this.y -= forceDirectionY * force * this.density * 0.6
         this.color = activeColor
       } else {
-        // Snap back to base, but gently
-        this.vx += (this.baseX - this.x) * 0.04
-        this.vy += (this.baseY - this.y) * 0.04
+        if (this.x !== this.baseX) {
+          const dx = this.x - this.baseX
+          this.x -= dx / 20
+        }
+        if (this.y !== this.baseY) {
+          const dy = this.y - this.baseY
+          this.y -= dy / 20
+        }
         this.color = particleColor
       }
+
       if (blastRef.current.active) {
         const blastDx = this.x - blastRef.current.x
         const blastDy = this.y - blastRef.current.y
         const blastDistance = Math.sqrt(blastDx * blastDx + blastDy * blastDy)
+
         if (blastDistance < blastRef.current.radius) {
           const blastForceX = blastDx / (blastDistance || 1)
           const blastForceY = blastDy / (blastDistance || 1)
           const blastForce = (blastRef.current.radius - blastDistance) / blastRef.current.radius
-          this.vx += blastForceX * blastForce * 7
-          this.vy += blastForceY * blastForce * 7
-          this.color = `rgba(180, 100, 255, 0.7)`
+
+          this.vx += blastForceX * blastForce * 15
+          this.vy += blastForceY * blastForce * 15
+
+          const intensity = Math.min(255, Math.floor(255 - blastDistance))
+          this.color = `rgba(${intensity}, 100, 255, 0.8)`
         }
       }
+
       this.draw()
     }
   }
@@ -237,38 +252,69 @@ function FluidParticles({
   const init = () => {
     const canvas = canvasRef.current
     if (!canvas) return
+
     contextRef.current = canvas.getContext("2d", { alpha: true })
+
     if (contextRef.current) {
-      contextRef.current.globalCompositeOperation = "source-over"
+      contextRef.current.globalCompositeOperation = "lighter"
     }
+
     const handleResize = () => {
-      const pixelRatio = 1 // always 1 for low-end
+      const pixelRatio = window.devicePixelRatio || 1
       canvas.width = window.innerWidth * pixelRatio
       canvas.height = window.innerHeight * pixelRatio
       canvas.style.width = `${window.innerWidth}px`
       canvas.style.height = `${window.innerHeight}px`
+
       if (contextRef.current) {
-        contextRef.current.setTransform(1, 0, 0, 1, 0, 0)
         contextRef.current.scale(pixelRatio, pixelRatio)
       }
+
       initParticles()
-      needsUpdate.current = true
     }
+
     window.addEventListener("resize", handleResize)
     handleResize()
+
+    let lastMoveTime = 0
+    const moveThrottle = 10
+
     window.addEventListener("mousemove", (e) => {
+      const now = performance.now()
+      if (now - lastMoveTime < moveThrottle) return
+      lastMoveTime = now
+
       const prevX = mouseRef.current.x
       const prevY = mouseRef.current.y
       mouseRef.current = { x: e.x, y: e.y, prevX, prevY }
-      needsUpdate.current = true
+
+      const dx = mouseRef.current.x - mouseRef.current.prevX
+      const dy = mouseRef.current.y - mouseRef.current.prevY
+      const distance = Math.sqrt(dx * dx + dy * dy)
+
+      if (distance < 5) {
+        if (hoverTimerRef.current === null) {
+          hoverTimerRef.current = setTimeout(() => {
+            triggerBlast(e.x, e.y)
+          }, hoverDelay)
+        }
+      } else {
+        if (hoverTimerRef.current) {
+          clearTimeout(hoverTimerRef.current)
+          hoverTimerRef.current = null
+        }
+      }
     })
+
     window.addEventListener("click", (e) => {
       triggerBlast(e.x, e.y)
-      needsUpdate.current = true
     })
+
     animate()
+
     return () => {
       window.removeEventListener("resize", handleResize)
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
       cancelAnimationFrame(animationRef.current)
     }
   }
@@ -281,29 +327,41 @@ function FluidParticles({
       radius: 0,
       maxRadius: maxBlastRadius,
     }
+
     const startTime = performance.now()
-    const duration = 180
+    const duration = 300
+
     const expandBlast = (timestamp: number) => {
       const elapsed = timestamp - startTime
       const progress = Math.min(elapsed / duration, 1)
+
       const easedProgress = progress * (2 - progress)
       blastRef.current.radius = easedProgress * blastRef.current.maxRadius
+
       if (progress < 1) {
         requestAnimationFrame(expandBlast)
       } else {
         setTimeout(() => {
           blastRef.current.active = false
-        }, 40)
+        }, 100)
       }
     }
+
     requestAnimationFrame(expandBlast)
+
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current)
+      hoverTimerRef.current = null
+    }
   }
 
   const initParticles = () => {
     particlesRef.current = []
     const canvas = canvasRef.current
     if (!canvas) return
+
     const particleCount = Math.floor((window.innerWidth * window.innerHeight) / particleDensity)
+
     for (let i = 0; i < particleCount; i++) {
       const x = Math.random() * window.innerWidth
       const y = Math.random() * window.innerHeight
@@ -312,20 +370,16 @@ function FluidParticles({
   }
 
   const animate = () => {
-    // Only update every 2nd frame for less CPU
-    frameSkip = (frameSkip + 1) % 2
-    if (frameSkip !== 0 && !needsUpdate.current) {
-      animationRef.current = requestAnimationFrame(animate)
-      return
-    }
-    needsUpdate.current = false
     const canvas = canvasRef.current
     const ctx = contextRef.current
     if (!canvas || !ctx) return
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+
     particlesRef.current.forEach((particle) => {
       particle.update()
     })
+
     animationRef.current = requestAnimationFrame(animate)
   }
 
@@ -385,62 +439,38 @@ function CoXistAIContactForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const saveToSupabase = async (data: ContactFormData) => {
-    try {
-      const { error } = await supabase
-        .from('subscribers')
-        .insert([
-          {
-            name: data.name,
-            email: data.email,
-            created_at: new Date().toISOString()
-          }
-        ]);
-
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      console.error('Error saving to Supabase:', error);
-      return false;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
     
     setIsSubmitting(true);
     
-    try {
-      const saved = await saveToSupabase(formData);
-      
-      if (saved) {
-        setIsSubmitting(false);
-        setIsSubmitted(true);
-        setShowPageAnimation(true);
-        
-        // Reset form after animation
-        setTimeout(() => {
-          setShowPageAnimation(false);
-          setIsSubmitted(false);
-          setFormData({ name: '', email: '' });
-        }, 4000);
-      } else {
-        setIsSubmitting(false);
-        // Handle error case
-        setErrors({ email: 'Failed to submit. Please try again.' });
-      }
-    } catch (error) {
-      setIsSubmitting(false);
-      setErrors({ email: 'Failed to submit. Please try again.' });
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+    
+    // Trigger page-wide animation
+    setShowPageAnimation(true);
+    
+    // Reset form after animation
+    setTimeout(() => {
+      setShowPageAnimation(false);
+      setIsSubmitted(false);
+      setFormData({ name: '', email: '' });
+    }, 4000);
   };
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
     visible: { 
       opacity: 1, 
-      y: 0
+      y: 0,
+      transition: { 
+        duration: 0.8, 
+        ease: [0.23, 0.86, 0.39, 0.96] 
+      }
     }
   };
 
@@ -460,12 +490,13 @@ function CoXistAIContactForm() {
       {/* Background Effects */}
       <div className="absolute inset-0">
         <FluidParticles
-          particleDensity={200}
-          particleSize={1}
+          particleDensity={120}
+          particleSize={1.5}
           particleColor="#333333"
           activeColor="#8b5cf6"
-          maxBlastRadius={180}
-          interactionDistance={40}
+          maxBlastRadius={250}
+          hoverDelay={50}
+          interactionDistance={80}
         />
         
         <AnimatedGridPattern
@@ -642,12 +673,13 @@ function CoXistAIContactForm() {
                   className="space-y-6"
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.18 }} // snappier
+                  transition={{ duration: 0.3 }}
                 >
                   <div className="text-center mb-6">
                     <h2 className="text-2xl font-semibold text-white mb-2">Get in Touch</h2>
                     <p className="text-white/60">Ready to explore AI solutions? We'd love to hear from you.</p>
                   </div>
+
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="name" className="text-white/80 font-medium">
@@ -661,9 +693,9 @@ function CoXistAIContactForm() {
                           placeholder="Enter your full name"
                           value={formData.name}
                           onChange={(e) => handleInputChange('name', e.target.value)}
-                          className={`pl-10 bg-white/[0.08] border-white/[0.15] text-white placeholder-white/40 focus:border-purple-400 focus:ring-purple-400/20 transition-all duration-150 ease-out ${errors.name ? 'border-red-400 focus:border-red-400' : ''}`}
-                          autoComplete="off"
-                          autoFocus
+                          className={`pl-10 bg-white/[0.08] border-white/[0.15] text-white placeholder-white/40 focus:border-purple-400 focus:ring-purple-400/20 ${
+                            errors.name ? 'border-red-400 focus:border-red-400' : ''
+                          }`}
                         />
                       </div>
                       {errors.name && (
@@ -676,6 +708,7 @@ function CoXistAIContactForm() {
                         </motion.p>
                       )}
                     </div>
+
                     <div>
                       <Label htmlFor="email" className="text-white/80 font-medium">
                         Email Address
@@ -688,8 +721,9 @@ function CoXistAIContactForm() {
                           placeholder="Enter your email address"
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
-                          className={`pl-10 bg-white/[0.08] border-white/[0.15] text-white placeholder-white/40 focus:border-purple-400 focus:ring-purple-400/20 transition-all duration-150 ease-out ${errors.email ? 'border-red-400 focus:border-red-400' : ''}`}
-                          autoComplete="off"
+                          className={`pl-10 bg-white/[0.08] border-white/[0.15] text-white placeholder-white/40 focus:border-purple-400 focus:ring-purple-400/20 ${
+                            errors.email ? 'border-red-400 focus:border-red-400' : ''
+                          }`}
                         />
                       </div>
                       {errors.email && (
@@ -703,28 +737,28 @@ function CoXistAIContactForm() {
                       )}
                     </div>
                   </div>
+
                   <motion.div
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full relative group overflow-hidden bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-150 disabled:opacity-50 border-0 shadow-lg"
+                      className="w-full relative group overflow-hidden bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-medium py-3 px-6 rounded-xl transition-all disabled:opacity-50 border-0"
                     >
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
                         initial={{ x: "-100%" }}
                         whileHover={{ x: "100%" }}
-                        transition={{ duration: 0.4 }}
+                        transition={{ duration: 0.5 }}
                       />
                       <span className="relative flex items-center justify-center gap-2">
                         {isSubmitting ? (
                           <motion.div
                             className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                           />
                         ) : (
                           <>
@@ -776,6 +810,6 @@ function CoXistAIContactForm() {
   );
 }
 
-export default function ContactForm() {
+export default function ContactFormDemo() {
   return <CoXistAIContactForm />;
 }
