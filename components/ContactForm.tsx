@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import supabase from '@/lib/supabase';
+import Image from "next/image";
 
 interface AnimatedGridPatternProps {
   width?: number;
@@ -68,9 +69,16 @@ function AnimatedGridPattern({
   };
 
   useEffect(() => {
+    function generateSquares(count: number) {
+      return Array.from({ length: count }, (_, i) => ({
+        id: i,
+        pos: getPos(),
+      }));
+    }
     if (dimensions.width && dimensions.height) {
       setSquares(generateSquares(numSquares));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dimensions, numSquares]);
 
   useEffect(() => {
@@ -82,17 +90,16 @@ function AnimatedGridPattern({
         });
       }
     });
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
+    const currentRef = containerRef.current;
+    if (currentRef) {
+      resizeObserver.observe(currentRef);
     }
-
     return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
+      if (currentRef) {
+        resizeObserver.unobserve(currentRef);
       }
     };
-  }, [containerRef]);
+  }, []);
 
   return (
     <svg
@@ -330,9 +337,10 @@ function FluidParticles({
   }
 
   useEffect(() => {
-    const cleanup = init()
-    return cleanup
-  }, [])
+    const cleanup = init();
+    return cleanup;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="">
@@ -546,7 +554,7 @@ function CoXistAIContactForm() {
                 transition={{ delay: 0.5 }}
                 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent flex items-center justify-center gap-3"
               >
-                <img src="/1x.png" alt="CoXistAI Logo" className="h-13 w-13 object-contain inline-block" />
+                <Image src="/1x.png" alt="CoXistAI Logo" width={40} height={40} className="h-10 w-10 object-contain inline-block" />
                 CoXistAI
               </motion.h2>
               <motion.p
@@ -645,7 +653,7 @@ function CoXistAIContactForm() {
               variants={fadeInUp}
             >
               The all-in-one app for your notes, AI-powered presentations, and more.
-              Stop juggling apps and start organizing your success.
+              Don&#39;t juggle apps and start organizing your success.
             </motion.p>
           </motion.div>
 
@@ -667,7 +675,7 @@ function CoXistAIContactForm() {
                 >
                   <div className="text-center mb-6">
                     <h2 className="text-2xl font-semibold text-white mb-2">Get in Touch</h2>
-                    <p className="text-white/60">Ready to explore AI solutions? We'd love to hear from you.</p>
+                    <p className="text-white/60">Ready to explore AI solutions? We&#39;d love to hear from you.</p>
                   </div>
                   <div className="space-y-4">
                     <div>
