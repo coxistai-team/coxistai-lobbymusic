@@ -479,32 +479,32 @@ function CoXistAIContactForm() {
         {/* Abstract Art Elements */}
         <div className="absolute inset-0">
           {/* Floating geometric shapes */}
-          <motion.div
+            <motion.div
             className="absolute top-1/4 left-1/6 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-xl"
-            animate={{
+              animate={{
               x: [0, 100, 0],
               y: [0, 50, 0],
               scale: [1, 1.2, 1],
-            }}
-            transition={{
+              }}
+              transition={{
               duration: 20,
-              repeat: Infinity,
+                repeat: Infinity,
               ease: "easeInOut"
             }}
           />
-          <motion.div
+            <motion.div
             className="absolute bottom-1/3 right-1/5 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg blur-lg"
-            animate={{
+              animate={{
               x: [0, -80, 0],
               y: [0, -60, 0],
               rotate: [0, 180, 360],
-            }}
-            transition={{
+              }}
+              transition={{
               duration: 25,
-              repeat: Infinity,
+                repeat: Infinity,
               ease: "easeInOut"
-            }}
-          />
+              }}
+            />
           
           {/* Pseudo elements with CSS */}
           <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-gradient-to-r from-violet-500/30 to-purple-500/30 transform rotate-45 animate-pulse" />
@@ -523,44 +523,64 @@ function CoXistAIContactForm() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               exit={{ scale: 0, rotate: 180 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
               className="text-center"
             >
               <motion.div
-                className="w-32 h-32 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center mx-auto mb-8"
-                animate={{ 
-                  boxShadow: [
-                    "0 0 0 0 rgba(34, 197, 94, 0.7)",
-                    "0 0 0 40px rgba(34, 197, 94, 0)",
-                    "0 0 0 0 rgba(34, 197, 94, 0)"
-                  ]
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
+                className="w-32 h-32 mx-auto mb-8 relative"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               >
-                <CheckCircle className="w-16 h-16 text-white" />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 opacity-20 animate-pulse" />
+                <CheckCircle className="w-32 h-32 text-green-400" />
               </motion.div>
               <motion.h2
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent"
+                className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent flex items-center justify-center gap-3"
               >
-                Message Sent Successfully!
+                <img src="/1x.png" alt="CoXistAI Logo" className="h-13 w-13 object-contain inline-block" />
+                CoXistAI
               </motion.h2>
               <motion.p
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
                 className="text-xl text-white/80"
               >
                 Thank you for reaching out to CoXistAI
               </motion.p>
+              {/* Celebration particles */}
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(20)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"
+                    style={{
+                      left: '50%',
+                      top: '50%',
+                    }}
+                    animate={{
+                      x: [0, (Math.random() - 0.5) * 400],
+                      y: [0, (Math.random() - 0.5) * 400],
+                      opacity: [1, 0],
+                      scale: [1, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      delay: i * 0.1,
+                      ease: "easeOut",
+                    }}
+                  />
+                ))}
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -621,27 +641,28 @@ function CoXistAIContactForm() {
             </motion.h1>
             
             <motion.p 
-              className="text-lg text-white/60 leading-relaxed"
+              className="text-lg text-white/60 leading-relaxed max-w-3xl mx-auto"
               variants={fadeInUp}
             >
-              Transforming the future with intelligent AI solutions. Let's connect and explore possibilities together.
+              The all-in-one app for your notes, AI-powered presentations, and more.
+              Stop juggling apps and start organizing your success.
             </motion.p>
           </motion.div>
 
           {/* Contact Form */}
           <motion.div 
-            className="bg-white/[0.05] backdrop-blur-xl rounded-3xl border border-white/[0.15] p-8 shadow-2xl"
+            className="bg-white/[0.05] backdrop-blur-xl rounded-3xl border border-white/[0.15] p-8 pt-0 shadow-2xl"
             variants={fadeInUp}
             whileHover={{ borderColor: "rgba(139, 92, 246, 0.3)" }}
           >
-            <AnimatePresence mode="wait">
-              {!isSubmitted ? (
-                <motion.form
-                  key="form"
-                  onSubmit={handleSubmit}
-                  className="space-y-6"
-                  initial={{ opacity: 1 }}
-                  exit={{ opacity: 0, y: -20 }}
+                <AnimatePresence mode="wait">
+                  {!isSubmitted ? (
+                    <motion.form
+                      key="form"
+                      onSubmit={handleSubmit}
+                      className="space-y-6"
+                      initial={{ opacity: 1 }}
+                      exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.18 }} // snappier
                 >
                   <div className="text-center mb-6">
@@ -666,16 +687,16 @@ function CoXistAIContactForm() {
                           autoFocus
                         />
                       </div>
-                      {errors.name && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-red-400 text-sm mt-2"
-                        >
-                          {errors.name}
-                        </motion.p>
-                      )}
-                    </div>
+                        {errors.name && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-400 text-sm mt-2"
+                          >
+                            {errors.name}
+                          </motion.p>
+                        )}
+                      </div>
                     <div>
                       <Label htmlFor="email" className="text-white/80 font-medium">
                         Email Address
@@ -692,73 +713,73 @@ function CoXistAIContactForm() {
                           autoComplete="off"
                         />
                       </div>
-                      {errors.email && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-red-400 text-sm mt-2"
-                        >
-                          {errors.email}
-                        </motion.p>
-                      )}
-                    </div>
+                        {errors.email && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-400 text-sm mt-2"
+                          >
+                            {errors.email}
+                          </motion.p>
+                        )}
+                      </div>
                   </div>
-                  <motion.div
+                        <motion.div
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
                     transition={{ type: "spring", stiffness: 300, damping: 18 }}
                   >
                     <Button
-                      type="submit"
-                      disabled={isSubmitting}
+                        type="submit"
+                        disabled={isSubmitting}
                       className="w-full relative group overflow-hidden bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-150 disabled:opacity-50 border-0 shadow-lg"
-                    >
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
-                        initial={{ x: "-100%" }}
-                        whileHover={{ x: "100%" }}
+                      >
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: "100%" }}
                         transition={{ duration: 0.4 }}
-                      />
-                      <span className="relative flex items-center justify-center gap-2">
-                        {isSubmitting ? (
-                          <motion.div
-                            className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                            animate={{ rotate: 360 }}
+                        />
+                        <span className="relative flex items-center justify-center gap-2">
+                          {isSubmitting ? (
+                            <motion.div
+                              className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                              animate={{ rotate: 360 }}
                             transition={{ duration: 0.7, repeat: Infinity, ease: "linear" }}
-                          />
-                        ) : (
-                          <>
+                            />
+                          ) : (
+                            <>
                             <Send className="h-5 w-5" />
                             Connect with CoXistAI
-                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                          </>
-                        )}
-                      </span>
+                              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                            </>
+                          )}
+                        </span>
                     </Button>
                   </motion.div>
-                </motion.form>
-              ) : (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-8"
-                >
-                  <motion.div
-                    className="w-16 h-16 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center mx-auto mb-4"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  >
-                    <CheckCircle className="w-8 h-8 text-green-400" />
-                  </motion.div>
+                    </motion.form>
+                  ) : (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-center py-8"
+                    >
+                      <motion.div
+                        className="w-16 h-16 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center mx-auto mb-4"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      >
+                        <CheckCircle className="w-8 h-8 text-green-400" />
+                      </motion.div>
                   <h3 className="text-xl font-bold text-white mb-2">Message Sent!</h3>
                   <p className="text-white/60 text-sm">
                     Thank you for reaching out. Our team will get back to you soon.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
           </motion.div>
 
           {/* Footer */}
