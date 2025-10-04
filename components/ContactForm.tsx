@@ -1,21 +1,30 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Mail,
-  User,
-  Send,
-  CheckCircle,
-  Sparkles,
-  ArrowRight,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import supabase from "@/lib/supabase";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+    ArrowRight,
+    Building2,
+    CheckCircle,
+    DollarSign,
+  Mail,
+  Send,
+  Sparkles,
+    TrendingUp,
+    User,
+} from "lucide-react";
 import Image from "next/image";
+import { useEffect, useId, useRef, useState } from "react";
 
 interface AnimatedGridPatternProps {
   width?: number;
@@ -368,22 +377,36 @@ function FluidParticles({
 interface ContactFormData {
   name: string;
   email: string;
+  companyName: string;
+  revenueMaking: string;
+  mrr: string;
+  investmentRaised: string;
+  investmentAmount: string;
 }
 
 interface ContactFormErrors {
   name?: string;
   email?: string;
+  companyName?: string;
+  revenueMaking?: string;
+  mrr?: string;
+  investmentRaised?: string;
+  investmentAmount?: string;
 }
 
 function CoXistAIContactForm() {
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
+    companyName: "",
+    revenueMaking: "",
+    mrr: "",
+    investmentRaised: "",
+    investmentAmount: "",
   });
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [showPageAnimation, setShowPageAnimation] = useState(false);
 
   const handleInputChange = (field: keyof ContactFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -396,13 +419,29 @@ function CoXistAIContactForm() {
     const newErrors: ContactFormErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = "Founder name is required";
     }
 
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email";
+    }
+
+    if (!formData.companyName.trim()) {
+      newErrors.companyName = "Company name is required";
+    }
+
+    if (!formData.revenueMaking) {
+      newErrors.revenueMaking = "Please select if you're making revenue";
+    }
+
+    if (formData.revenueMaking === "yes" && !formData.mrr.trim()) {
+      newErrors.mrr = "MRR is required when making revenue";
+    }
+
+    if (formData.investmentRaised === "yes" && !formData.investmentAmount.trim()) {
+      newErrors.investmentAmount = "Investment amount is required when you've raised investment";
     }
 
     setErrors(newErrors);
@@ -415,6 +454,11 @@ function CoXistAIContactForm() {
         {
           name: data.name,
           email: data.email,
+          company_name: data.companyName,
+          revenue_making: data.revenueMaking,
+          mrr: data.mrr || null,
+          investment_raised: data.investmentRaised || null,
+          investment_amount: data.investmentAmount || null,
           created_at: new Date().toISOString(),
         },
       ]);
@@ -439,14 +483,20 @@ function CoXistAIContactForm() {
       if (saved) {
         setIsSubmitting(false);
         setIsSubmitted(true);
-        setShowPageAnimation(true);
 
-        // Reset form after animation
+        // Reset form after showing success message
         setTimeout(() => {
-          setShowPageAnimation(false);
           setIsSubmitted(false);
-          setFormData({ name: "", email: "" });
-        }, 4000);
+          setFormData({
+            name: "",
+            email: "",
+            companyName: "",
+            revenueMaking: "",
+            mrr: "",
+            investmentRaised: "",
+            investmentAmount: ""
+          });
+        }, 3000);
       } else {
         setIsSubmitting(false);
         // Handle error case
@@ -478,191 +528,106 @@ function CoXistAIContactForm() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div className="min-h-screen bg-slate-900 text-white relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <FluidParticles
-          particleDensity={200}
-          particleSize={1}
-          particleColor="#333333"
-          activeColor="#8b5cf6"
-          maxBlastRadius={180}
-          interactionDistance={40}
+          particleDensity={300}
+          particleSize={0.8}
+          particleColor="#475569"
+          activeColor="#3b82f6"
+          maxBlastRadius={120}
+          interactionDistance={30}
         />
 
         <AnimatedGridPattern
-          numSquares={40}
-          maxOpacity={0.08}
-          duration={3}
-          repeatDelay={1}
-          className="[mask-image:radial-gradient(800px_circle_at_center,white,transparent)] inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+          numSquares={60}
+          maxOpacity={0.03}
+          duration={4}
+          repeatDelay={2}
+          className="[mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
         />
 
-        {/* Abstract Art Elements */}
+        {/* Professional geometric elements */}
         <div className="absolute inset-0">
-          {/* Floating geometric shapes */}
           <motion.div
-            className="absolute top-1/4 left-1/6 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-xl"
+            className="absolute top-1/4 left-1/6 w-24 h-24 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-lg blur-xl"
             animate={{
-              x: [0, 100, 0],
-              y: [0, 50, 0],
-              scale: [1, 1.2, 1],
+              x: [0, 50, 0],
+              y: [0, 30, 0],
+              scale: [1, 1.1, 1],
             }}
             transition={{
-              duration: 20,
+              duration: 30,
               repeat: Infinity,
               ease: "easeInOut",
             }}
           />
           <motion.div
-            className="absolute bottom-1/3 right-1/5 w-24 h-24 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg blur-lg"
+            className="absolute bottom-1/3 right-1/5 w-20 h-20 bg-gradient-to-br from-slate-500/10 to-gray-500/10 rounded-lg blur-lg"
             animate={{
-              x: [0, -80, 0],
-              y: [0, -60, 0],
-              rotate: [0, 180, 360],
+              x: [0, -40, 0],
+              y: [0, -30, 0],
+              rotate: [0, 90, 180, 270, 360],
             }}
             transition={{
-              duration: 25,
+              duration: 40,
               repeat: Infinity,
               ease: "easeInOut",
             }}
           />
-
-          {/* Pseudo elements with CSS */}
-          <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-gradient-to-r from-violet-500/30 to-purple-500/30 transform rotate-45 animate-pulse" />
-          <div className="absolute bottom-1/4 left-1/4 w-12 h-12 bg-gradient-to-r from-emerald-500/30 to-teal-500/30 rounded-full animate-bounce" />
         </div>
 
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-transparent to-blue-900/10" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-violet-900/5 to-transparent" />
+        {/* Professional gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-800/5 via-transparent to-blue-900/5" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-slate-700/3 to-transparent" />
       </div>
 
-      {/* Page-wide success animation overlay */}
-      <AnimatePresence>
-        {showPageAnimation && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: 180 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="text-center"
-            >
-              <motion.div
-                className="w-32 h-32 mx-auto mb-8 relative"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              >
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 opacity-20 animate-pulse" />
-                <CheckCircle className="w-32 h-32 text-green-400" />
-              </motion.div>
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent flex items-center justify-center gap-3"
-              >
-                <Image
-                  src="/1x.png"
-                  alt="CoXistAI Logo"
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 object-contain inline-block"
-                />
-                CoXistAI
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-                className="text-xl text-white/80"
-              >
-                Thank you for reaching out to CoXistAI
-              </motion.p>
-              {/* Celebration particles */}
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(20)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-2 h-2 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"
-                    style={{
-                      left: "50%",
-                      top: "50%",
-                    }}
-                    animate={{
-                      x: [0, (Math.random() - 0.5) * 400],
-                      y: [0, (Math.random() - 0.5) * 400],
-                      opacity: [1, 0],
-                      scale: [1, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      delay: i * 0.1,
-                      ease: "easeOut",
-                    }}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Main Content */}
       <motion.div
-        className="relative z-10 min-h-screen flex items-center justify-center px-6"
+        className="relative z-10 h-screen flex items-center justify-center px-6 py-4 overflow-hidden"
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
       >
         <div className="w-full max-w-md">
           {/* Logo/Brand */}
-          <motion.div className="text-center mb-12" variants={fadeInUp}>
+          <motion.div className="text-center mb-6" variants={fadeInUp}>
             <motion.div
-              className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/[0.08] border border-white/[0.15] backdrop-blur-sm mb-6"
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-white/[0.05] border border-white/[0.1] backdrop-blur-sm mb-6"
               whileHover={{
-                scale: 1.05,
-                borderColor: "rgba(139, 92, 246, 0.5)",
+                scale: 1.02,
+                borderColor: "rgba(59, 130, 246, 0.3)",
               }}
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                <Sparkles className="h-4 w-4 text-purple-300" />
-              </motion.div>
-              <span className="text-sm font-medium text-white/80">
-                AI-Powered Solutions
+              <div className="w-2 h-2 bg-blue-400 rounded-full" />
+              <span className="text-sm font-medium text-white/70 tracking-wide">
+                ENTERPRISE AI SOLUTIONS
               </span>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+              <div className="w-2 h-2 bg-blue-400 rounded-full" />
             </motion.div>
 
             <motion.h1
-              className="text-5xl md:text-6xl font-bold mb-4 tracking-tight"
+              className="text-3xl md:text-4xl font-bold mb-3 tracking-tight"
               variants={fadeInUp}
             >
               <motion.div className="inline-flex items-center">
                 <img
                   src="/5x.png"
                   alt="CoXistAI Logo"
-                  className="h-20 w-20 object-contain inline-block"
+                  className="h-16 w-16 object-contain inline-block mr-3"
                 />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80 pr-1">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-300 pr-1">
                   CoXist
                 </span>
                 <motion.span
-                  className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400"
+                  className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500"
                   animate={{
                     backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
                   }}
                   transition={{
-                    duration: 5,
+                    duration: 8,
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
@@ -676,19 +641,19 @@ function CoXistAIContactForm() {
             </motion.h1>
 
             <motion.p
-              className="text-lg text-white/60 leading-relaxed max-w-3xl mx-auto"
+              className="text-sm text-slate-300 leading-relaxed max-w-2xl mx-auto font-light"
               variants={fadeInUp}
             >
-              The all-in-one app for your notes, AI-powered presentations, and
-              more. Don&#39;t juggle apps and start organizing your success.
+              Transform your business with intelligent automation and data-driven insights. 
+              Join forward-thinking companies leveraging AI for competitive advantage.
             </motion.p>
           </motion.div>
 
           {/* Contact Form */}
           <motion.div
-            className="bg-white/[0.05] backdrop-blur-xl rounded-3xl border border-white/[0.15] p-8 pt-0 shadow-2xl"
+            className="bg-white/[0.03] backdrop-blur-xl rounded-2xl border border-white/[0.08] p-6 shadow-xl max-h-[50vh] overflow-y-auto"
             variants={fadeInUp}
-            whileHover={{ borderColor: "rgba(139, 92, 246, 0.3)" }}
+            whileHover={{ borderColor: "rgba(59, 130, 246, 0.2)" }}
           >
             <AnimatePresence mode="wait">
               {!isSubmitted ? (
@@ -701,21 +666,20 @@ function CoXistAIContactForm() {
                   transition={{ duration: 0.18 }} // snappier
                 >
                   <div className="text-center mb-6">
-                    <h2 className="text-2xl font-semibold text-white mb-2">
-                      Get in Touch
+                    <h2 className="text-2xl font-semibold text-white mb-3">
+                      Business Partnership Inquiry
                     </h2>
-                    <p className="text-white/60">
-                      Ready to explore AI solutions? We&#39;d love to hear from
-                      you.
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                      Share your company details and we&#39;ll explore how our AI solutions can drive your business forward.
                     </p>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
                       <Label
                         htmlFor="name"
                         className="text-white/80 font-medium"
                       >
-                        Your Name
+                        Founder Name *
                       </Label>
                       <div className="relative mt-2">
                         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
@@ -727,7 +691,7 @@ function CoXistAIContactForm() {
                           onChange={(e) =>
                             handleInputChange("name", e.target.value)
                           }
-                          className={`pl-10 bg-white/[0.08] border-white/[0.15] text-white placeholder-white/40 focus:border-purple-400 focus:ring-purple-400/20 transition-all duration-150 ease-out ${
+                          className={`pl-10 bg-white/[0.05] border-white/[0.1] text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out ${
                             errors.name
                               ? "border-red-400 focus:border-red-400"
                               : ""
@@ -751,7 +715,7 @@ function CoXistAIContactForm() {
                         htmlFor="email"
                         className="text-white/80 font-medium"
                       >
-                        Email Address
+                        Email Address *
                       </Label>
                       <div className="relative mt-2">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
@@ -763,7 +727,7 @@ function CoXistAIContactForm() {
                           onChange={(e) =>
                             handleInputChange("email", e.target.value)
                           }
-                          className={`pl-10 bg-white/[0.08] border-white/[0.15] text-white placeholder-white/40 focus:border-purple-400 focus:ring-purple-400/20 transition-all duration-150 ease-out ${
+                          className={`pl-10 bg-white/[0.05] border-white/[0.1] text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out ${
                             errors.email
                               ? "border-red-400 focus:border-red-400"
                               : ""
@@ -781,22 +745,208 @@ function CoXistAIContactForm() {
                         </motion.p>
                       )}
                     </div>
+                    <div>
+                      <Label
+                        htmlFor="companyName"
+                        className="text-white/80 font-medium"
+                      >
+                        Company Name *
+                      </Label>
+                      <div className="relative mt-2">
+                        <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                        <Input
+                          id="companyName"
+                          type="text"
+                          placeholder="Enter your company name"
+                          value={formData.companyName}
+                          onChange={(e) =>
+                            handleInputChange("companyName", e.target.value)
+                          }
+                          className={`pl-10 bg-white/[0.05] border-white/[0.1] text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out ${
+                            errors.companyName
+                              ? "border-red-400 focus:border-red-400"
+                              : ""
+                          }`}
+                          autoComplete="off"
+                        />
+                  </div>
+                      {errors.companyName && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-red-400 text-sm mt-2"
+                        >
+                          {errors.companyName}
+                        </motion.p>
+                      )}
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="revenueMaking"
+                        className="text-white/80 font-medium"
+                      >
+                        Are you making revenue? *
+                      </Label>
+                      <div className="relative mt-2">
+                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40 z-10" />
+                        <Select
+                          value={formData.revenueMaking}
+                          onValueChange={(value) =>
+                            handleInputChange("revenueMaking", value)
+                          }
+                        >
+                          <SelectTrigger
+                            className={`pl-10 bg-white/[0.05] border-white/[0.1] text-white focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out ${
+                              errors.revenueMaking
+                                ? "border-red-400 focus:border-red-400"
+                                : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="Select an option" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-slate-600 text-white">
+                            <SelectItem value="yes">Yes</SelectItem>
+                            <SelectItem value="no">No</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {errors.revenueMaking && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-red-400 text-sm mt-2"
+                        >
+                          {errors.revenueMaking}
+                        </motion.p>
+                      )}
+                    </div>
+                    {formData.revenueMaking === "yes" && (
+                  <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Label
+                          htmlFor="mrr"
+                          className="text-white/80 font-medium"
+                        >
+                          Monthly Recurring Revenue (MRR)
+                        </Label>
+                        <div className="relative mt-2">
+                          <TrendingUp className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                          <Input
+                            id="mrr"
+                            type="text"
+                            placeholder="e.g., $5,000"
+                            value={formData.mrr}
+                            onChange={(e) =>
+                              handleInputChange("mrr", e.target.value)
+                            }
+                            className={`pl-10 bg-white/[0.05] border-white/[0.1] text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out ${
+                              errors.mrr
+                                ? "border-red-400 focus:border-red-400"
+                                : ""
+                            }`}
+                            autoComplete="off"
+                          />
+                        </div>
+                        {errors.mrr && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-400 text-sm mt-2"
+                          >
+                            {errors.mrr}
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    )}
+                    <div>
+                      <Label
+                        htmlFor="investmentRaised"
+                        className="text-white/80 font-medium"
+                      >
+                        Have you raised investment?
+                      </Label>
+                      <div className="relative mt-2">
+                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40 z-10" />
+                        <Select
+                          value={formData.investmentRaised}
+                          onValueChange={(value) =>
+                            handleInputChange("investmentRaised", value)
+                          }
+                        >
+                          <SelectTrigger
+                            className="pl-10 bg-white/[0.05] border-white/[0.1] text-white focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out"
+                          >
+                            <SelectValue placeholder="Select an option" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-slate-600 text-white">
+                            <SelectItem value="yes">Yes</SelectItem>
+                            <SelectItem value="no">No</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    {formData.investmentRaised === "yes" && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Label
+                          htmlFor="investmentAmount"
+                          className="text-white/80 font-medium"
+                        >
+                          Investment Amount
+                        </Label>
+                        <div className="relative mt-2">
+                          <TrendingUp className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                          <Input
+                            id="investmentAmount"
+                            type="text"
+                            placeholder="e.g., $100,000"
+                            value={formData.investmentAmount}
+                            onChange={(e) =>
+                              handleInputChange("investmentAmount", e.target.value)
+                            }
+                            className={`pl-10 bg-white/[0.05] border-white/[0.1] text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out ${
+                              errors.investmentAmount
+                                ? "border-red-400 focus:border-red-400"
+                                : ""
+                            }`}
+                            autoComplete="off"
+                          />
+                        </div>
+                        {errors.investmentAmount && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-400 text-sm mt-2"
+                          >
+                            {errors.investmentAmount}
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    )}
                   </div>
                   <motion.div
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
                   >
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full relative group overflow-hidden bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-150 disabled:opacity-50 border-0 shadow-lg"
+                      className="w-full relative group overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 disabled:opacity-50 border-0 shadow-lg"
                     >
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
+                        className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"
                         initial={{ x: "-100%" }}
                         whileHover={{ x: "100%" }}
-                        transition={{ duration: 0.4 }}
+                        transition={{ duration: 0.6 }}
                       />
                       <span className="relative flex items-center justify-center gap-2">
                         {isSubmitting ? (
@@ -804,15 +954,15 @@ function CoXistAIContactForm() {
                             className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                             animate={{ rotate: 360 }}
                             transition={{
-                              duration: 0.7,
+                              duration: 0.8,
                               repeat: Infinity,
                               ease: "linear",
                             }}
                           />
                         ) : (
                           <>
-                            <Send className="h-5 w-5" />
-                            Connect with CoXistAI
+                            <Send className="h-4 w-4" />
+                            Submit Partnership Inquiry
                             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </>
                         )}
@@ -825,22 +975,21 @@ function CoXistAIContactForm() {
                   key="success"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-8"
+                  className="text-center py-12"
                 >
                   <motion.div
-                    className="w-16 h-16 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center mx-auto mb-4"
+                    className="w-16 h-16 rounded-full bg-blue-500/20 border border-blue-400/30 flex items-center justify-center mx-auto mb-6"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                   >
-                    <CheckCircle className="w-8 h-8 text-green-400" />
+                    <CheckCircle className="w-8 h-8 text-blue-400" />
                   </motion.div>
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    Message Sent!
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    Partnership Inquiry Submitted
                   </h3>
-                  <p className="text-white/60 text-sm">
-                    Thank you for reaching out. Our team will get back to you
-                    soon.
+                  <p className="text-slate-400 text-sm leading-relaxed max-w-sm mx-auto">
+                    Thank you for your interest in CoXistAI. Our business development team will review your information and contact you within 24-48 hours.
                   </p>
                 </motion.div>
               )}
@@ -848,10 +997,9 @@ function CoXistAIContactForm() {
           </motion.div>
 
           {/* Footer */}
-          <motion.div className="text-center mt-8" variants={fadeInUp}>
-            <p className="text-white/40 text-sm">
-              © 2025 CoXistAI. Pioneering the future of artificial
-              intelligence.
+          <motion.div className="text-center mt-6" variants={fadeInUp}>
+            <p className="text-slate-500 text-xs tracking-wide">
+              © 2025 CoXistAI. Enterprise AI Solutions for Modern Business.
             </p>
           </motion.div>
         </div>
