@@ -4,26 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import supabase from "@/lib/supabase";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    ArrowRight,
-    Building2,
-    CheckCircle,
-    DollarSign,
+  ArrowRight,
+  Building2,
+  CheckCircle,
+  DollarSign,
   Mail,
   Send,
-  Sparkles,
-    TrendingUp,
-    User,
+  TrendingUp,
+  User,
 } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 
 interface AnimatedGridPatternProps {
@@ -49,7 +47,6 @@ function AnimatedGridPattern({
   className = "",
   maxOpacity = 0.5,
   duration = 4,
-  repeatDelay = 0.5,
   ...props
 }: AnimatedGridPatternProps) {
   const id = useId();
@@ -440,8 +437,12 @@ function CoXistAIContactForm() {
       newErrors.mrr = "MRR is required when making revenue";
     }
 
-    if (formData.investmentRaised === "yes" && !formData.investmentAmount.trim()) {
-      newErrors.investmentAmount = "Investment amount is required when you've raised investment";
+    if (
+      formData.investmentRaised === "yes" &&
+      !formData.investmentAmount.trim()
+    ) {
+      newErrors.investmentAmount =
+        "Investment amount is required when you've raised investment";
     }
 
     setErrors(newErrors);
@@ -465,8 +466,8 @@ function CoXistAIContactForm() {
 
       if (error) throw error;
       return true;
-    } catch (error) {
-      console.error("Error saving to Supabase:", error);
+    } catch {
+      // Error saving to Supabase
       return false;
     }
   };
@@ -494,7 +495,7 @@ function CoXistAIContactForm() {
             revenueMaking: "",
             mrr: "",
             investmentRaised: "",
-            investmentAmount: ""
+            investmentAmount: "",
           });
         }, 3000);
       } else {
@@ -502,7 +503,7 @@ function CoXistAIContactForm() {
         // Handle error case
         setErrors({ email: "Failed to submit. Please try again." });
       }
-    } catch (error) {
+    } catch {
       setIsSubmitting(false);
       setErrors({ email: "Failed to submit. Please try again." });
     }
@@ -583,7 +584,6 @@ function CoXistAIContactForm() {
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-slate-700/3 to-transparent" />
       </div>
 
-
       {/* Main Content */}
       <motion.div
         className="relative z-10 h-screen flex items-center justify-center px-6 py-4 overflow-hidden"
@@ -613,6 +613,7 @@ function CoXistAIContactForm() {
               variants={fadeInUp}
             >
               <motion.div className="inline-flex items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/5x.png"
                   alt="CoXistAI Logo"
@@ -644,8 +645,9 @@ function CoXistAIContactForm() {
               className="text-sm text-slate-300 leading-relaxed max-w-2xl mx-auto font-light"
               variants={fadeInUp}
             >
-              Transform your business with intelligent automation and data-driven insights. 
-              Join forward-thinking companies leveraging AI for competitive advantage.
+              Transform your business with intelligent automation and
+              data-driven insights. Join forward-thinking companies leveraging
+              AI for competitive advantage.
             </motion.p>
           </motion.div>
 
@@ -670,7 +672,8 @@ function CoXistAIContactForm() {
                       Business Partnership Inquiry
                     </h2>
                     <p className="text-slate-400 text-sm leading-relaxed">
-                      Share your company details and we&#39;ll explore how our AI solutions can drive your business forward.
+                      Share your company details and we&#39;ll explore how our
+                      AI solutions can drive your business forward.
                     </p>
                   </div>
                   <div className="space-y-3">
@@ -769,7 +772,7 @@ function CoXistAIContactForm() {
                           }`}
                           autoComplete="off"
                         />
-                  </div>
+                      </div>
                       {errors.companyName && (
                         <motion.p
                           initial={{ opacity: 0, y: -10 }}
@@ -821,7 +824,7 @@ function CoXistAIContactForm() {
                       )}
                     </div>
                     {formData.revenueMaking === "yes" && (
-                  <motion.div
+                      <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
@@ -877,9 +880,7 @@ function CoXistAIContactForm() {
                             handleInputChange("investmentRaised", value)
                           }
                         >
-                          <SelectTrigger
-                            className="pl-10 bg-white/[0.05] border-white/[0.1] text-white focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out"
-                          >
+                          <SelectTrigger className="pl-10 bg-white/[0.05] border-white/[0.1] text-white focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out">
                             <SelectValue placeholder="Select an option" />
                           </SelectTrigger>
                           <SelectContent className="bg-slate-800 border-slate-600 text-white">
@@ -910,7 +911,10 @@ function CoXistAIContactForm() {
                             placeholder="e.g., $100,000"
                             value={formData.investmentAmount}
                             onChange={(e) =>
-                              handleInputChange("investmentAmount", e.target.value)
+                              handleInputChange(
+                                "investmentAmount",
+                                e.target.value
+                              )
                             }
                             className={`pl-10 bg-white/[0.05] border-white/[0.1] text-white placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 ease-out ${
                               errors.investmentAmount
@@ -989,7 +993,9 @@ function CoXistAIContactForm() {
                     Partnership Inquiry Submitted
                   </h3>
                   <p className="text-slate-400 text-sm leading-relaxed max-w-sm mx-auto">
-                    Thank you for your interest in CoXistAI. Our business development team will review your information and contact you within 24-48 hours.
+                    Thank you for your interest in CoXistAI. Our business
+                    development team will review your information and contact
+                    you within 24-48 hours.
                   </p>
                 </motion.div>
               )}

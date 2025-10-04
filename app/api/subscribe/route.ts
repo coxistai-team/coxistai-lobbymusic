@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       revenueMaking,
       mrr,
       investmentRaised,
-      investmentAmount
+      investmentAmount,
     } = await request.json();
 
     if (!name || !email || !companyName || !revenueMaking) {
@@ -20,17 +20,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { error } = await supabase
-      .from("subscribers")
-      .insert([{
+    const { error } = await supabase.from("subscribers").insert([
+      {
         name,
         email,
         company_name: companyName,
         revenue_making: revenueMaking,
         mrr: mrr || null,
         investment_raised: investmentRaised || null,
-        investment_amount: investmentAmount || null
-      }]);
+        investment_amount: investmentAmount || null,
+      },
+    ]);
 
     if (error) {
       if (error.code === "23505") {
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error saving subscriber:", error);
+  } catch {
+    // Error saving subscriber
     return NextResponse.json(
       { error: "Failed to save subscriber" },
       { status: 500 }
